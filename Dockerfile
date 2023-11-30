@@ -23,24 +23,64 @@ RUN apt-get update && apt-get install -y \
     libswscale-dev \
     libswresample-dev
 
-# RUN apt-get install -y libavformat-dev
-# RUN apt-get install -y libavcodec-dev
-# RUN apt-get install -y libavdevice-dev
-# RUN apt-get install -y libavutil-dev
-# RUN apt-get install -y libavfilter-dev
-# RUN apt-get install -y libswscale-dev
-# RUN apt-get install -y libswresample-dev
-
 # Install Python 3 (Ubuntu 22.04 comes with Python 3.10)
 RUN apt-get update && apt-get install -y python3 python3-pip
 
 # Set the working directory inside the container
-WORKDIR /usr/src/app
+# WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY requirements.txt ./
+##############################
+# Install PyTorch / TinyCuda #
+##############################
+
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 RUN TCNN_CUDA_ARCHITECTURES=89 pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 
-# Install nvdiffrast: https://nvlabs.github.io/nvdiffrast/#linux
+######################
+# Install nvdiffrast #
+######################
 
+RUN git clone --branch v0.3.1 https://github.com/NVlabs/nvdiffrast.git --single-branch && \
+    cd nvdiffrast
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    pkg-config \
+    libglvnd0 \
+    libgl1 \
+    libglx0 \
+    libegl1 \
+    libgles2 \
+    libglvnd-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libgles2-mesa-dev \
+    cmake 
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# for GLEW
+ENV LD_LIBRARY_PATH /usr/lib64:$LD_LIBRARY_PATH
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
+
+# Default pyopengl to EGL for good headless rendering support
+ENV PYOPENGL_PLATFORM egl
+
+COPY nvdiffrast/docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+
+RUN pip3 install --upgrade pip
+RUN pip3 install ninja imageio imageio-ffmpeg
+
+COPY nvdiffrast /tmp/pip/nvdiffrast/
+COPY README.md setup.py /tmp/pip/
+RUN cd /tmp/pip && pip install .
+
+RUN cd /app
+
+# Install pip requirements from TriMipRF
+COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt
