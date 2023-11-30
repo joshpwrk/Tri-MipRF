@@ -75,10 +75,10 @@ RUN pip3 install --upgrade pip
 RUN pip3 install ninja imageio imageio-ffmpeg
 
 RUN mkdir -p /tmp/pip/nvdiffrast
-RUN cp -r nvdiffrast/nvdiffrast /tmp/pip/nvdiffrast/
+RUN cp -r nvdiffrast/nvdiffrast /tmp/pip/
 RUN cp nvdiffrast/setup.py /tmp/pip/
 RUN cp nvdiffrast/README.md /tmp/pip/
-# RUN cd /tmp/pip && pip install .
+RUN cd /tmp/pip && pip install .
 
 # Install pip requirements from TriMipRF
 COPY requirements.txt ./
