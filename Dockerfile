@@ -41,9 +41,6 @@ RUN TCNN_CUDA_ARCHITECTURES=89 pip install git+https://github.com/NVlabs/tiny-cu
 # Install nvdiffrast #
 ######################
 
-RUN git clone --branch v0.3.1 https://github.com/NVlabs/nvdiffrast.git --single-branch && \
-    cd nvdiffrast
-
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     pkg-config \
     libglvnd0 \
@@ -56,6 +53,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     libegl1-mesa-dev \
     libgles2-mesa-dev \
     cmake 
+
+RUN git clone --branch v0.3.1 https://github.com/NVlabs/nvdiffrast.git --single-branch
+RUN cd nvdiffrast
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -70,7 +70,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
 # Default pyopengl to EGL for good headless rendering support
 ENV PYOPENGL_PLATFORM egl
 
-COPY nvdiffrast/docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+COPY docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 
 RUN pip3 install --upgrade pip
 RUN pip3 install ninja imageio imageio-ffmpeg
