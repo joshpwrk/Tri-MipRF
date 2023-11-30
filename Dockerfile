@@ -81,5 +81,10 @@ RUN cp nvdiffrast/README.md /tmp/pip/
 RUN cd /tmp/pip && pip install .
 
 # Install pip requirements from TriMipRF
+RUN apt-get update && apt-get install -y \
+    libcurl4-openssl-dev \
+    libssl-dev
+
 COPY requirements.txt ./
-# RUN pip3 install --no-cache-dir -r requirements.txt
+# TODO: could use VENV everywhere
+RUN pip3 install --ignore-installed --no-cache-dir -r requirements.txt
