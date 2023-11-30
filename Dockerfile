@@ -74,6 +74,7 @@ RUN cp nvdiffrast/docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.
 RUN pip3 install --upgrade pip
 RUN pip3 install ninja imageio imageio-ffmpeg
 
+RUN mkdir -p /tmp/pip/nvdiffrast
 RUN cp -r nvdiffrast/nvdiffrast /tmp/pip/nvdiffrast/
 RUN cp nvdiffrast/setup.py /tmp/pip/
 RUN cd /tmp/pip && pip install .
