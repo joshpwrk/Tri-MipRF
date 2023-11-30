@@ -55,7 +55,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     cmake 
 
 RUN git clone --branch v0.3.1 https://github.com/NVlabs/nvdiffrast.git --single-branch
-RUN cd nvdiffrast
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -70,16 +69,14 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
 # Default pyopengl to EGL for good headless rendering support
 ENV PYOPENGL_PLATFORM egl
 
-COPY docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+COPY nvdiffrast/docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 
 RUN pip3 install --upgrade pip
 RUN pip3 install ninja imageio imageio-ffmpeg
 
-COPY nvdiffrast /tmp/pip/nvdiffrast/
+COPY nvdiffrast/nvdiffrast /tmp/pip/nvdiffrast/
 COPY README.md setup.py /tmp/pip/
 RUN cd /tmp/pip && pip install .
-
-RUN cd /app
 
 # Install pip requirements from TriMipRF
 COPY requirements.txt ./
