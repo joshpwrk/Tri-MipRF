@@ -69,13 +69,13 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
 # Default pyopengl to EGL for good headless rendering support
 ENV PYOPENGL_PLATFORM egl
 
-RUN cp -r nvdiffrast/docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+RUN cp nvdiffrast/docker/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 
 RUN pip3 install --upgrade pip
 RUN pip3 install ninja imageio imageio-ffmpeg
 
 RUN cp -r nvdiffrast/nvdiffrast /tmp/pip/nvdiffrast/
-RUN cp -r nvdiffrast/setup.py /tmp/pip/
+RUN cp nvdiffrast/setup.py /tmp/pip/
 RUN cd /tmp/pip && pip install .
 
 # Install pip requirements from TriMipRF
